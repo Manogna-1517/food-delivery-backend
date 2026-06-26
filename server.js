@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
+const config = require("./config");
 const User = require("./models/User");
 const Restaurant = require("./models/Restaurant");
 const DeliveryPartner = require("./models/DeliveryPartner");
@@ -33,8 +34,8 @@ app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/delivery", deliveryRoutes);
 
 const seedData = async () => {
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
-  const adminPassword = process.env.ADMIN_PASSWORD || "Admin@12345";
+  const adminEmail = config.adminEmail;
+  const adminPassword = config.adminPassword;
 
   let adminUser = await User.findOne({ email: adminEmail });
   if (!adminUser) {
@@ -75,18 +76,18 @@ const seedData = async () => {
   }
 };
 
-mongoose.connect("mongodb://localhost:27017/ecommerce")
+mongoose.connect(config.mongoURI)
   .then(async () => {
     console.log("MongoDB Connected");
     await seedData();
-    const PORT = process.env.PORT || 5000;
+    const PORT = config.port;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((err) => {
     console.log("MongoDB Connection Error:", err);
-    const PORT = process.env.PORT || 5000;
+    const PORT = config.port;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
